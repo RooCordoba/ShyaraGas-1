@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.shyaragas.app</groupId>
-	<artifactId>ShyaragGas</artifactId>
+	<artifactId>ShyaraGas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ShyaraGas</name>
 	<description>Shyara Gas app</description>
