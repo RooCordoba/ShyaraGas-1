@@ -1,6 +1,7 @@
 package com.shyaragas.app.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
@@ -98,5 +101,64 @@ public class SUsers {
 		} catch (Exception e) {
 			throw (e);
 		}
+	}
+	
+	public UpdateItemOutcome updateUser (Users userJson) {
+		DynamoDB claw = new DynamoDB(AWSConnections.client);
+		Table myTable =claw.getTable(tableName);
+		
+		try{
+			PrimaryKey pk = new PrimaryKey("id", userJson.getId());
+			Item itemUser = myTable.getItem(pk);
+			Users userDB = new Users();
+			userDB.setId(itemUser.getInt("id"));
+			userDB.setName(itemUser.getString("name"));
+			userDB.setLastName(itemUser.getString("lastName"));
+			userDB.setDni(itemUser.getInt("dni"));
+			userDB.setSex(itemUser.getInt("sex"));
+			
+			
+			Map<String , String> nombresDeAtributos = new HashMap<String, String>();
+			
+			//nombresDeAtributos.put("id", "id");
+			nombresDeAtributos.put("#n", "name");
+			nombresDeAtributos.put("#ln", "lastName");
+			nombresDeAtributos.put("#s", "sex");
+			nombresDeAtributos.put("#dni", "dni"); //aca tengo un mapa con los nombre representativos de los nombres de los atributos en la tabla
+			
+			Map<String, Object> valoresDeAtributos = new HashMap <String, Object>();
+			if(userJson.getName() == "") 
+				valoresDeAtributos.put(":v1", userDB.getName());
+			
+			else
+				valoresDeAtributos.put(":v1", userJson.getName());
+			
+			if(userJson.getLastName() == "")
+				valoresDeAtributos.put(":v2", userDB.getLastName());
+			else
+				valoresDeAtributos.put(":v2", userJson.getLastName());
+			
+			if(userJson.getSex() <3 && userJson.getSex() >=0)
+                valoresDeAtributos.put(":v4", userDB.getSex());
+            else
+                valoresDeAtributos.put(":v4", userJson.getSex());
+            if(userJson.getDni() == 0)
+                valoresDeAtributos.put(":v3", userDB.getDni());
+            else
+                valoresDeAtributos.put(":v3", userJson.getDni());
+			
+            
+			UpdateItemOutcome result = myTable.updateItem(
+					"id", //nombre de la clave primaria (igual exacto que se ve en AWS, osea id)
+					userJson.getId(), //valor de la clave primaria (que quiero modificar)
+					"set #n = :v1, #ln = :v2, #s = :v4, #dni = :v3", //Expresion en String que AWS entiende 
+					nombresDeAtributos, valoresDeAtributos); //De donde saco el nombre y el valor de lo que updateo
+			return result;
+		}
+		catch (Exception e) {
+			throw (e);
+		}
+		
+		
 	}
 }
