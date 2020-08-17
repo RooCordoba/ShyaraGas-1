@@ -16,30 +16,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
-import com.shyaragas.app.models.Users;
+import com.shyaragas.app.models.User;
 import com.shyaragas.app.services.SUsers;
 
 @Controller
-public class CUsers {
+public class UsersController
+{
 	
 	@Autowired
 	SUsers sUsers; //al new lo hizo spring por detras, ya existe la instancia porque le dijiste que era un servicio
 	
 	@GetMapping(value = "/getAllUsers", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<Users> getUsers(){
+	public List<User> getUsers(){
 		return sUsers.getUsers();
 	}
 	
-	@GetMapping (value = "getAllUsers/{id}", produces = MediaType.APPLICATION_JSON_VALUE) // ,produces = MediaType.APPLICATION_JSON_VALUE ->
+	@GetMapping (value = "getUser/{id}", produces = MediaType.APPLICATION_JSON_VALUE) // ,produces = MediaType.APPLICATION_JSON_VALUE ->
 	@ResponseBody
-	public Users getUserById(@PathVariable int id){
+	public User getUserById(@PathVariable int id){
 		return sUsers.getUserById(id);
 	}
 	@PostMapping (value = "/newUser", produces = MediaType.APPLICATION_JSON_VALUE,
 	consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Users newUser(@RequestBody Users user) {
+	public User newUser(@RequestBody User user) {
 		return sUsers.insertUser(user);
 	}
 	
@@ -52,7 +53,7 @@ public class CUsers {
 	@PatchMapping (value = "/updateUser", produces = MediaType.APPLICATION_JSON_VALUE, 
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UpdateItemOutcome updateItem(@RequestBody Users user)
+    public UpdateItemOutcome updateItem(@RequestBody User user)
     {
          return sUsers.updateUser(user);
     }

@@ -18,7 +18,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.shyaragas.app.helpers.AWSConnections;
-import com.shyaragas.app.models.Users;
+import com.shyaragas.app.models.User;
 
 @Service					//le dice a spring que instancie una copia y despues la uso cuando la quiera
 public class SUsers {
@@ -26,15 +26,15 @@ public class SUsers {
 	String tableName = "ShyaraGasUsers"; //String con nombre de la tabla declarada 
 										//por nosotros (tableName), de la base de datos
 
-	public List<Users> getUsers(){
+	public List<User> getUsers(){
 		
 		ScanRequest scan = new ScanRequest().withTableName(tableName); //creacion del objeto scan
 		ScanResult result = AWSConnections.client.scan(scan); //scan() es el metodo, scan es el objeto
-		List<Users> listUsers = new ArrayList<Users>(); //la clase List es una interfaz
+		List<User> listUsers = new ArrayList<User>(); //la clase List es una interfaz
 		
 		for(Map<String, AttributeValue> x: result.getItems()) { // result.getItems() devuelve una lsita de mapas, y los
 																//mapas son de tipo Map<String, AttributeValue>
-			Users usuario = new Users();
+			User usuario = new User();
 			usuario.setName(x.get("name").getS());
 			usuario.setDni(Integer.parseInt(x.get("dni").getN())); 	//getN me va a devolver un numero "String", para convertirlo en Int, tengo que poner Integer.parseInt("lo que quiera convertir)
 																  	//parseInt transforma de string a int
@@ -47,9 +47,9 @@ public class SUsers {
 		return listUsers;
 	}
 	
-	public Users getUserById (int id) {
+	public User getUserById (int id) {
 		
-		Users user = new Users();
+		User user = new User();
 		DynamoDB claw = new DynamoDB(AWSConnections.client); // AWSConnections es la clase que nosotros creamos para conectarnos 
 		Table myTable = claw.getTable(tableName);
 		GetItemSpec myItem = new GetItemSpec().withPrimaryKey("id", id); //creamos un objeto que busque el id con el id que le pasamos
@@ -66,11 +66,11 @@ public class SUsers {
 		}
 		
 		catch (Exception e){
-			return new Users();
+			return new User();
 		}
 	}
 	
-	public Users insertUser (Users user) {
+	public User insertUser (User user) {
 		
 		DynamoDB claw = new DynamoDB(AWSConnections.client);
 		Table myTable = claw.getTable(tableName);
@@ -85,7 +85,7 @@ public class SUsers {
 					return user;
 		}
 		catch (Exception e) {
-			return new Users();
+			return new User();
 		}
 	}
 	
@@ -103,14 +103,14 @@ public class SUsers {
 		}
 	}
 	
-	public UpdateItemOutcome updateUser (Users userJson) {
+	public UpdateItemOutcome updateUser (User userJson) {
 		DynamoDB claw = new DynamoDB(AWSConnections.client);
 		Table myTable =claw.getTable(tableName);
 		
 		try{
 			PrimaryKey pk = new PrimaryKey("id", userJson.getId());
 			Item itemUser = myTable.getItem(pk);
-			Users userDB = new Users();
+			User userDB = new User();
 			userDB.setId(itemUser.getInt("id"));
 			userDB.setName(itemUser.getString("name"));
 			userDB.setLastName(itemUser.getString("lastName"));

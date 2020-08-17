@@ -17,31 +17,32 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
-import com.shyaragas.app.models.Clients;
-import com.shyaragas.app.services.SClients;
+import com.shyaragas.app.models.Client;
+import com.shyaragas.app.services.ClientService;
 
 @Controller
-public class CClients {
+public class ClientsController
+{
 
 	@Autowired
-	SClients sClients;
+	ClientService sClients;
 	
 	@GetMapping(value = "/getAllClients", produces = MediaType.APPLICATION_JSON_VALUE )
 	@ResponseBody
-	public List<Clients> getClients(){
+	public List<Client> getClients(){
 		return sClients.getClients();
 	}
 	
-	@GetMapping(value = "/getAllClients/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getClient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Clients getClientById(@PathVariable int id) {
+	public Client getClientById(@PathVariable int id) {
 		return sClients.getClientById(id);
 	}
 
 	@PostMapping (value = "/newClient", produces = MediaType.APPLICATION_JSON_VALUE,
 				 consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Clients insertClient(@RequestBody Clients client) {
+	public Client insertClient(@RequestBody Client client) {
 		return sClients.insertClient(client);
 	}
 	
@@ -54,7 +55,7 @@ public class CClients {
 	@PatchMapping (value = "/updateClient" , produces = MediaType.APPLICATION_JSON_VALUE,
 			consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public UpdateItemOutcome updateClient (@RequestBody Clients client) {
+	public UpdateItemOutcome updateClient (@RequestBody Client client) {
 		return sClients.updateClient(client);
 	}
 }

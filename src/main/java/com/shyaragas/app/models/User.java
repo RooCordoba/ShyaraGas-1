@@ -1,9 +1,13 @@
 package com.shyaragas.app.models;
 
 
-public class Users {
-	private String name, lastName;
-	private int dni, sex, id; 
+public class User
+{
+	private String name;
+	private String lastName;
+	private int dni;
+	private int sex;
+	private int id;
 
 	public int getId() {
 		return id;
