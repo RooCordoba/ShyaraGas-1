@@ -23,33 +23,44 @@ public class ClientService
 	{
 		List<Map<String, AttributeValue>> result = clientRepository.getAllItems();
 		List<Client> clientsList = new ArrayList<>();
-
-
-
-
 		for (Map<String, AttributeValue> map : result)
 		{
-			Map mapVehicle = map.get("vehiclelist").getM().get("vehicle1").getM();
-			Vehicle vehicle = new Vehicle();
-			vehicle.setBrand(mapVehicle.get("brand").toString());
-			vehicle.setId(mapVehicle.get("id")); //TODO: CHECK THIS SHIET OUT
-			vehicle.setModel(mapVehicle.get("model").toString());
-			vehicle.setFeatures(mapVehicle.get("feature").toString());
-			vehicle.setPlate(mapVehicle.get("plate").toString());
-			vehicle.setProblems(mapVehicle.get("problems").toString());
-
-			Client client = new ClientBuilder(
+			Map<String, AttributeValue> map2 = map.get("vehiclelist").getM();
+			ClientBuilder clientBuilder = new ClientBuilder(
 					map.get("name").getS(),
 					map.get("lastname").getS(),
 					map.get("phonenumber").getS()
-			)
-					.withDni(Integer.parseInt(map.get("dni").getN()))
+			);
+			for(AttributeValue vehicleProperty : map2.values())
+			{
+				Vehicle vehicle = new Vehicle();
+				vehicle.setId(Integer.parseInt(vehicleProperty.getM().get("id").getN()));
+				vehicle.setFeatures(vehicleProperty.getM().get("features").getS());
+				vehicle.setProblems(vehicleProperty.getM().get("problems").getS());
+				vehicle.setPlate(vehicleProperty.getM().get("plate").getS());
+				vehicle.setBrand(vehicleProperty.getM().get("brand").getS());
+				vehicle.setModel(vehicleProperty.getM().get("model").getS());
+				clientBuilder.withVehicles(vehicle);
+			}
+			Client client = clientBuilder.withDni(Integer.parseInt(map.get("dni").getN()))
 					.withEmail(map.get("email").getS())
-					.withVehicles(vehicle)
 					.build();
 			clientsList.add(client);
 		}
 		return clientsList;
+	}
+
+	private Vehicle getVehicles(Map<String, AttributeValue> map, int id)
+	{
+		Map<String, AttributeValue> mapVehicle = map.get("vehiclelist").getM().get("vehicle"+id).getM();
+
+		Vehicle vehicle = new Vehicle();
+		vehicle.setId(Integer.parseInt(mapVehicle.get("id").getN()));
+		vehicle.setBrand(mapVehicle.get("brand").getS());
+		vehicle.setPlate(mapVehicle.get("plate").getS());
+		vehicle.setProblems(mapVehicle.get("problems").getS());
+		vehicle.setFeatures(mapVehicle.get("features").getS());
+		return vehicle;
 	}
 }
 
