@@ -18,6 +18,11 @@ public class Vehicle
         this.features = features;
     }
 
+    public Vehicle()
+    {
+
+    }
+
     public int getId()
     {
         return id;
