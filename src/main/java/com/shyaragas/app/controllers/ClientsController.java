@@ -2,37 +2,30 @@ package com.shyaragas.app.controllers;
 
 
 
-import java.util.List;
-
+import com.shyaragas.app.models.Client;
+import com.shyaragas.app.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
-import com.shyaragas.app.models.Client;
-import com.shyaragas.app.services.ClientService;
+import java.util.List;
 
 @Controller
 public class ClientsController
 {
 
 	@Autowired
-	ClientService sClients;
+	ClientService clientService;
 	
 	@GetMapping(value = "/getAllClients", produces = MediaType.APPLICATION_JSON_VALUE )
 	@ResponseBody
-	public List<Client> getClients(){
-		return sClients.getClients();
+	public List<Client> getClients() throws Exception
+	{
+		return clientService.getAllClients();
 	}
-	
+	/*
 	@GetMapping(value = "/getClient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Client getClientById(@PathVariable int id) {
@@ -57,7 +50,7 @@ public class ClientsController
 	@ResponseBody
 	public UpdateItemOutcome updateClient (@RequestBody Client client) {
 		return sClients.updateClient(client);
-	}
+	}*/
 }
 
 
