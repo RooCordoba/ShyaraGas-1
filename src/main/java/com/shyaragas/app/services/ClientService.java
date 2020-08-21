@@ -1,6 +1,8 @@
 package com.shyaragas.app.services;
 
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.shyaragas.app.helpers.exceptions.ClientNotFoundException;
 import com.shyaragas.app.models.Client;
 import com.shyaragas.app.models.ClientBuilder;
 import com.shyaragas.app.models.Vehicle;
@@ -8,9 +10,7 @@ import com.shyaragas.app.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ClientService
@@ -33,14 +33,7 @@ public class ClientService
 			);
 			for(AttributeValue vehicleProperty : map2.values())
 			{
-				Vehicle vehicle = new Vehicle();
-				vehicle.setId(Integer.parseInt(vehicleProperty.getM().get("id").getN()));
-				vehicle.setFeatures(vehicleProperty.getM().get("features").getS());
-				vehicle.setProblems(vehicleProperty.getM().get("problems").getS());
-				vehicle.setPlate(vehicleProperty.getM().get("plate").getS());
-				vehicle.setBrand(vehicleProperty.getM().get("brand").getS());
-				vehicle.setModel(vehicleProperty.getM().get("model").getS());
-				clientBuilder.withVehicles(vehicle);
+				clientBuilder.withVehicles(buildVehicle(vehicleProperty));
 			}
 			Client client = clientBuilder.withDni(Integer.parseInt(map.get("dni").getN()))
 					.withEmail(map.get("email").getS())
@@ -50,18 +43,65 @@ public class ClientService
 		return clientsList;
 	}
 
-	private Vehicle getVehicles(Map<String, AttributeValue> map, int id)
+	public Client getClientById(int id) throws ClientNotFoundException
 	{
-		Map<String, AttributeValue> mapVehicle = map.get("vehiclelist").getM().get("vehicle"+id).getM();
+		Item item = clientRepository.getItemById(id);
+		ClientBuilder clientBuilder;
+		String name = item.get("name").toString();
+		String lastname = item.get("lastname").toString();
+		String phoneNumber = item.get("phonenumber").toString();
+		clientBuilder = new ClientBuilder(name, lastname, phoneNumber)
+				.withEmail(item.get("email").toString())
+				.withDni(Integer.parseInt(item.get("dni").toString()))
+				.withId(Integer.parseInt(item.get("id").toString()));
+		HashMap<String, AttributeValue> vehicles = (HashMap<String, AttributeValue>) item.get("vehiclelist");
+		LinkedHashMap<String, LinkedHashMap> vehicles.values();
 
-		Vehicle vehicle = new Vehicle();
-		vehicle.setId(Integer.parseInt(mapVehicle.get("id").getN()));
-		vehicle.setBrand(mapVehicle.get("brand").getS());
-		vehicle.setPlate(mapVehicle.get("plate").getS());
-		vehicle.setProblems(mapVehicle.get("problems").getS());
-		vehicle.setFeatures(mapVehicle.get("features").getS());
-		return vehicle;
+
+
+
+
+
+
+
+
+
+
+		return null;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private Vehicle buildVehicle(AttributeValue attributeVehicle)
+    {
+    	Vehicle vehicle = new Vehicle();
+		vehicle.setId(Integer.parseInt(attributeVehicle.getM().get("id").getN()));
+		vehicle.setFeatures(attributeVehicle.getM().get("features").getS());
+		vehicle.setProblems(attributeVehicle.getM().get("problems").getS());
+		vehicle.setPlate(attributeVehicle.getM().get("plate").getS());
+		vehicle.setBrand(attributeVehicle.getM().get("brand").getS());
+		vehicle.setModel(attributeVehicle.getM().get("model").getS());
+        return vehicle;
+    }
+
+
+
+
+
+
+
 }
 
 

@@ -1,13 +1,14 @@
 package com.shyaragas.app.controllers;
 
 
-
+import com.shyaragas.app.helpers.exceptions.ClientNotFoundException;
 import com.shyaragas.app.models.Client;
 import com.shyaragas.app.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -25,6 +26,16 @@ public class ClientsController
 	{
 		return clientService.getAllClients();
 	}
+
+	@GetMapping(value = "/getClient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Client getClient(@PathVariable int id) throws ClientNotFoundException
+	{
+		return clientService.getClientById(id);
+	}
+
+
+
 	/*
 	@GetMapping(value = "/getClient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
