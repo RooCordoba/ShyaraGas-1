@@ -10,7 +10,10 @@ import com.shyaragas.app.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ClientService
@@ -33,7 +36,8 @@ public class ClientService
 			);
 			for(AttributeValue vehicleProperty : map2.values())
 			{
-				clientBuilder.withVehicles(buildVehicle(vehicleProperty));
+				Map<String, AttributeValue> mapa = vehicleProperty.getM();
+				clientBuilder.withVehicles(buildVehicleWithMapAttribute(mapa));
 			}
 			Client client = clientBuilder.withDni(Integer.parseInt(map.get("dni").getN()))
 					.withEmail(map.get("email").getS())
@@ -54,49 +58,37 @@ public class ClientService
 				.withEmail(item.get("email").toString())
 				.withDni(Integer.parseInt(item.get("dni").toString()))
 				.withId(Integer.parseInt(item.get("id").toString()));
-		HashMap<String, AttributeValue> vehicles = (HashMap<String, AttributeValue>) item.get("vehiclelist");
-		LinkedHashMap<String, LinkedHashMap> vehicles.values();
+		LinkedHashMap<String, LinkedHashMap<String, Object>> vehicles = (LinkedHashMap<String, LinkedHashMap<String, Object>>) item.get("vehiclelist");
+		for(LinkedHashMap<String, Object> map : vehicles.values())
+		{
+			clientBuilder.withVehicles(buildVehicleWithMapObject(map));
+		}
+		return clientBuilder.build();
 
-
-
-
-
-
-
-
-
-
-
-		return null;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	private Vehicle buildVehicle(AttributeValue attributeVehicle)
+	private Vehicle buildVehicleWithMapObject(Map<String, Object> map)
     {
     	Vehicle vehicle = new Vehicle();
-		vehicle.setId(Integer.parseInt(attributeVehicle.getM().get("id").getN()));
-		vehicle.setFeatures(attributeVehicle.getM().get("features").getS());
-		vehicle.setProblems(attributeVehicle.getM().get("problems").getS());
-		vehicle.setPlate(attributeVehicle.getM().get("plate").getS());
-		vehicle.setBrand(attributeVehicle.getM().get("brand").getS());
-		vehicle.setModel(attributeVehicle.getM().get("model").getS());
+		vehicle.setModel(map.get("model").toString());
+		vehicle.setBrand(map.get("brand").toString());
+		vehicle.setPlate(map.get("plate").toString());
+		vehicle.setProblems(map.get("problems").toString());
+		vehicle.setFeatures(map.get("features").toString());
         return vehicle;
     }
 
 
+	private Vehicle buildVehicleWithMapAttribute(Map<String, AttributeValue> map)
+	{
+		Vehicle vehicle = new Vehicle();
+		vehicle.setModel(map.get("model").getS());
+		vehicle.setBrand(map.get("brand").getS());
+		vehicle.setPlate(map.get("plate").getS());
+		vehicle.setProblems(map.get("problems").getS());
+		vehicle.setFeatures(map.get("features").getS());
+		return vehicle;
+	}
 
 
 
