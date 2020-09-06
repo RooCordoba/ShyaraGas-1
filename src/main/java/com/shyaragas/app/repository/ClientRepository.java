@@ -1,56 +1,94 @@
 package com.shyaragas.app.repository;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
-import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
-import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shyaragas.app.helpers.AWSConnections;
 import com.shyaragas.app.models.Client;
+import com.shyaragas.app.models.Vehicle;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 @Repository
 public class ClientRepository extends AWSRepository
 {
-    public Client updateItem(Client client){
-        PrimaryKey pk = new PrimaryKey("id", client.getId());
-        Item itemFromDB;
+    DynamoDBMapper mapper = new DynamoDBMapper(AWSConnections.client);
+
+
+    public Client saveClient(Client client)
+    {
         try
         {
-            itemFromDB = MY_TABLE.getItem(pk);
-        }
-        catch(Exception e)
-        {
-            throw e;
-        }
-        try
-        {
-            UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey(pk)
-                    .withUpdateExpression("set #n = :v1, #l = :v2, #e = :v3, #v = :v4, #p = :v5, #d = :v6")
-                    .withNameMap(new NameMap()
-                            .with("#n", "name")
-                            .with("#l", "lastName")
-                            .with("#e", "email")
-                            .with("#v", "vehicle")
-                            .with("#p", "phoneNumber")
-                            .with("#d", "dni"))
-                    .withValueMap(new ValueMap()
-                            .withStringSet(":v1", client.getName())
-                            .withStringSet(":v2", client.getLastName())
-                            .withStringSet(":v3", client.getEmail())
-                            .withList(":v4", client.getVehicleList())
-                            .withStringSet(":v5", client.getPhoneNumber())
-                            .withInt(":v6", client.getDni()));
-            UpdateItemOutcome updateItemOutcome = MY_TABLE.updateItem(updateItemSpec);
+            mapper.save(client);
             return client;
         }
         catch(Exception e)
         {
             throw e;
         }
-        //TODO: CHECK AWS DOCUMENTATION TO IMPROVE EXCEPTION CATCHING
-
     }
 
+    public Client getClientById(String id) throws JsonProcessingException
+    {
+        List<Vehicle> vehicles = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Client client = mapper.load(Client.class, id);
 
+        Table table = DYNAMO_DB_CLAW.getTable("ShyaraGasVehicles");
+
+        HashMap<String, String> nameMap = new HashMap<String, String>();
+        nameMap.put("#cid", "clientId");
+
+        HashMap<String, Object> valueMap = new HashMap<String, Object>();
+        valueMap.put(":clientId", id);
+
+        ScanSpec scanSpec = new ScanSpec().withProjectionExpression("#cid, id, brand, model, plate, problems, features")
+                .withFilterExpression("#cid = :clientId")
+                .withNameMap(nameMap)
+                .withValueMap(valueMap);
+
+        ItemCollection<ScanOutcome> scanOutcome = table.scan(scanSpec);
+        Iterator<Item> iter = scanOutcome.iterator();
+        while (iter.hasNext()) {
+            Item item = iter.next();
+            Vehicle vehicle = objectMapper.readValue(item.toJSON(),Vehicle.class);
+            vehicles.add(vehicle);
+        }
+        client.setVehiclelist(vehicles);
+        return client;
+    }
+
+    public List<Client> getAllClients()
+    {
+        return mapper.scan(Client.class, new DynamoDBScanExpression());
+    }
+
+    public String deleteClient(String id)
+    {
+        try{
+            Client client = getClientById(id);
+            List<Vehicle> vehicles = client.getVehiclelist();
+            vehicles.stream()
+                    .forEach(vehicle -> {
+                        mapper.delete(vehicle);
+                    });
+            mapper.delete(client);
+            return "Se borró el cliente y sus vehículos con éxito";
+        }
+        catch (JsonProcessingException e)
+        {
+            e.printStackTrace();
+            return "No se pudo borrar el cliente, verifique la información e intentelo nuevamente";
+        }
+    }
 }
