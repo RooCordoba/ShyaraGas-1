@@ -8,8 +8,8 @@ public class ClientBuilder
     private String name = "";
     private String lastName = "";
     private String email = "";
-    private List<Vehicle> vehicleList = new ArrayList<>();
-    private int id = 0;
+    private List vehicleList = new ArrayList<>();
+    private String id = "0";
     private int dni = 0;
     private String phoneNumber = "";
 
@@ -26,7 +26,7 @@ public class ClientBuilder
         return this;
     }
 
-    public ClientBuilder withId(int id)
+    public ClientBuilder withId(String id)
     {
         this.id = id;
         return this;
