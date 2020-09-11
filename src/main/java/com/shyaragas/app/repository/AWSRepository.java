@@ -1,5 +1,7 @@
 package com.shyaragas.app.repository;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -10,9 +12,12 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.shyaragas.app.helpers.AWSConnections;
 import com.shyaragas.app.helpers.exceptions.ClientNotFoundException;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+
+
 
 public abstract class AWSRepository
 {
@@ -20,7 +25,13 @@ public abstract class AWSRepository
     protected final DynamoDB DYNAMO_DB_CLAW = new DynamoDB(AWSConnections.client);
     protected final Table MY_TABLE = DYNAMO_DB_CLAW.getTable(TABLE_NAME);
 
+    protected final String USER_TABLE_NAME = "ShyaraGasUsers";
+    protected final Table USER_TABLE = DYNAMO_DB_CLAW.getTable(TABLE_NAME);
 
+
+
+
+/*
     public Item getItemById(int id) throws ClientNotFoundException
     {
         try
@@ -75,5 +86,5 @@ public abstract class AWSRepository
         {
             throw e;
         }
-    }
+    }*/
 }

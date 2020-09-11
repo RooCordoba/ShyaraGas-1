@@ -46,36 +46,7 @@ public class ClientsController
 	{
 		return clientService.deleteClient(id);
 	}
-
-
-
-
-	/*
-	@GetMapping(value = "/getClient/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public Client getClientById(@PathVariable int id) {
-		return sClients.getClientById(id);
-	}
-
-	@PostMapping (value = "/newClient", produces = MediaType.APPLICATION_JSON_VALUE,
-				 consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public Client insertClient(@RequestBody Client client) {
-		return sClients.insertClient(client);
-	}
 	
-	@DeleteMapping (value = "/deleteClient/{id}", produces = MediaType.APPLICATION_JSON_VALUE )
-	@ResponseBody
-	public DeleteItemOutcome deleteClient (@PathVariable int id) {
-		return sClients.deleteClient(id);
-	}
-
-	@PatchMapping (value = "/updateClient" , produces = MediaType.APPLICATION_JSON_VALUE,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public UpdateItemOutcome updateClient (@RequestBody Client client) {
-		return sClients.updateClient(client);
-	}*/
 }
 
 
