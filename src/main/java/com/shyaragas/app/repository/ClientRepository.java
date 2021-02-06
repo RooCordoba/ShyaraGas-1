@@ -1,6 +1,5 @@
 package com.shyaragas.app.repository;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
@@ -9,7 +8,6 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shyaragas.app.helpers.AWSConnections;
 import com.shyaragas.app.models.Client;
 import com.shyaragas.app.models.Vehicle;
 import org.springframework.stereotype.Repository;
@@ -18,13 +16,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class ClientRepository extends AWSRepository
 {
-    DynamoDBMapper mapper = new DynamoDBMapper(AWSConnections.client);
-
-
     public Client saveClient(Client client)
     {
         try
@@ -70,7 +66,18 @@ public class ClientRepository extends AWSRepository
 
     public List<Client> getAllClients()
     {
-        return mapper.scan(Client.class, new DynamoDBScanExpression());
+        List<Client> clientList = mapper.scan(Client.class, new DynamoDBScanExpression());
+        List<Vehicle> vehicleList = mapper.scan(Vehicle.class, new DynamoDBScanExpression());
+
+        clientList.stream()
+                .forEach(client ->
+        {   //stream: conjunto de acciones que se le aplican a cada elemento de una coleccion
+            List<Vehicle> vehiculos = vehicleList.stream()
+                    .filter(vehicle -> vehicle.getClientId().equals(client.getId()))
+                    .collect(Collectors.toList());
+            client.setVehiclelist(vehiculos);
+        });
+        return clientList;
     }
 
     public String deleteClient(String id)
@@ -91,4 +98,5 @@ public class ClientRepository extends AWSRepository
             return "No se pudo borrar el cliente, verifique la información e intentelo nuevamente";
         }
     }
+
 }
