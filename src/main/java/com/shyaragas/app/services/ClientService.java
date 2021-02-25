@@ -14,7 +14,6 @@ import java.util.Map;
 @Service
 public class ClientService
 {
-
 	@Autowired
 	ClientRepository clientRepository;
 
@@ -39,7 +38,6 @@ public class ClientService
 		return clientRepository.deleteClient(id);
 	}
 
-
 	private Vehicle buildVehicleWithMapObject(Map<String, Object> map)
     {
     	Vehicle vehicle = new Vehicle();
@@ -51,7 +49,6 @@ public class ClientService
         return vehicle;
     }
 
-
 	private Vehicle buildVehicleWithMapAttribute(Map<String, AttributeValue> map)
 	{
 		Vehicle vehicle = new Vehicle();
@@ -62,11 +59,6 @@ public class ClientService
 		vehicle.setFeatures(map.get("features").getS());
 		return vehicle;
 	}
-
-
-
-
-
 }
 
 

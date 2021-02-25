@@ -3,8 +3,6 @@ package com.shyaragas.app.controllers;
 
 import java.util.List;
 
-import com.shyaragas.app.repository.Users_Repository;
-import com.shyaragas.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -16,12 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.shyaragas.app.models.User;
-
+import com.shyaragas.app.services.UserService;
 
 @Controller
 public class UsersController
 {
-	
 	@Autowired
 	UserService userService; //al new lo hizo spring por detras, ya existe la instancia porque le dijiste que era un servicio
 	
@@ -30,7 +27,7 @@ public class UsersController
 	public List<User> getUsers() throws Exception {
 		return userService.getAllUsers();
 	}
-	
+
 	@GetMapping (value = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE) // ,produces = MediaType.APPLICATION_JSON_VALUE ->
 	@ResponseBody
 	public User getUserById(@PathVariable String id) throws Exception {
@@ -48,6 +45,5 @@ public class UsersController
 	public String deleteUser(@PathVariable String id) throws Exception {
 		return userService.deleteUser(id);
 	}
-
 
 }

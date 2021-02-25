@@ -1,35 +1,35 @@
 package com.shyaragas.app.services;
 
 import com.shyaragas.app.models.User;
-import com.shyaragas.app.repository.Users_Repository;
+import com.shyaragas.app.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
+@Service
 public class UserService {
+
     @Autowired
-    Users_Repository users_repository;
+    UsersRepository usersRepository;
 
     public User saveUser(User user)
     {
-        users_repository.saveUser(user);
-        return user;
+       return usersRepository.saveUser(user);
     }
 
-    public User getUserById(String id) throws Exception
+    public User getUserById (String id)
     {
-        return users_repository.getUserById(id);
+        return usersRepository.getUserById(id);
     }
 
-    public List<User> getAllUsers() throws Exception
+    public List<User> getAllUsers()
     {
-        return users_repository.getAllUsers();
+        return usersRepository.getAllUsers();
     }
 
-    public String deleteUser(String id) throws Exception
+    public String deleteUser(String id)
     {
-        return users_repository.deleteUser(id);
+        return usersRepository.deleteUser(id);
     }
-
 }
